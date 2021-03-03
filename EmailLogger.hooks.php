@@ -4,16 +4,20 @@ class EmailLoggerHooks {
     public static function onAlternateUserMailer( $headers, $to, $from, $subject, $body ) {
         global $wgEmailLoggerLogFilePath, $wgEmailLoggerFailSilently;
 
+        // Get time
+        $timestamp = date('Y-m-d G:i:s T');
+
         // Log info in CSV format
         // By default, just log the to and subject
+        // fputcsv() does not always add double quotes, so we are not using it
         $destinations = "[";
         foreach ($to as $destination) {
-            $destinations .= $destination . ",";
+            $destinations .= str_replace('"', '', $destination) . ",";
         }
         $destinations = substr($destinations, 0, -1) . "]";
         $escaped_subject = addslashes($subject);
 
-        $log_info = "\"$destinations\",\"$escaped_subject\"";
+        $log_info = "\"$timestamp\",\"$destinations\",\"$escaped_subject\"";
         // if desired, log the email contents as well
         // temporarily disabled because that will not work well with multiline bodies, as almost
         // all emails are in MediaWiki
