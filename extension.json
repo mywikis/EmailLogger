@@ -6,7 +6,7 @@
   "version": "1.0",
   "license-name": "GPL-2.0",
   "type": "antispam",
-  "manifest_version": 2,
+  "manifest_version": 1,
   "MessagesDirs": {
     "EmailLogger": [
       "i18n"
