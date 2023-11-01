@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+
+  test:
+
+    runs-on: ubuntu-22.04
+    continue-on-error: ${{ matrix.experimental }}
+
+    strategy:
+      matrix:
+        include:
+          - mediawiki_version: '1.35'
+            php_version: 7.4
+            coverage: false
+            experimental: true
+          - mediawiki_version: '1.39'
+            php_version: 8.1
+            coverage: false
+            experimental: true
+          - mediawiki_version: '1.40'
+            php_version: 8.1
+            coverage: false
+            experimental: true
+
+    env:
+      MW_VERSION: ${{ matrix.mediawiki_version }}
+      SMW_VERSION: ${{ matrix.smw_version }}
+      PHP_VERSION: ${{ matrix.php_version }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+                   
+      - name: Update submodules
+        run: git submodule update --init --remote
+
+      - name: Run tests
+        run: make ci
+        if: matrix.coverage == false
+
+      - name: Run tests with coverage
+        run: make ci-coverage
+        if: matrix.coverage == true
